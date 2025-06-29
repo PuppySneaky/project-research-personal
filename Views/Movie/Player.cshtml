@@ -1,0 +1,321 @@
+﻿@{
+    ViewData["Title"] = "Watch Epic Movie - CineHub Comic Edition";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Epic Movie - CineHub Comic Edition</title>
+    <link rel="stylesheet" href="~/css/styles.css">
+    <link rel="stylesheet" href="~/css/player-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Creepster&family=Bungee&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Comic Book Floating Elements -->
+    <div class="comic-elements" id="comicElements">
+        <!-- Dynamic comic elements will be added here -->
+    </div>
+
+    <!-- Side Navigation -->
+    <div class="side-nav" id="sideNav">
+        <div class="side-nav-header">
+            <div class="side-nav-avatar">🦸</div>
+            <div class="side-nav-name" id="sideNavName">Welcome, Hero!</div>
+        </div>
+        <nav class="side-nav-menu">
+            <a href="@Url.Action("Index", "Movie")" class="side-nav-item">
+                <div class="side-nav-icon">🏠</div>
+                <div class="side-nav-text">Home Base</div>
+            </a>
+            <a href="#recent" class="side-nav-item" onclick="showRecent()">
+                <div class="side-nav-icon">⚡</div>
+                <div class="side-nav-text">Recent Action</div>
+            </a>
+            <a href="@Url.Action("Index", "Movie")#favorites" class="side-nav-item">
+                <div class="side-nav-icon">💥</div>
+                <div class="side-nav-text">Hero Picks</div>
+            </a>
+            <a href="@Url.Action("Profile", "Account")" class="side-nav-item">
+                <div class="side-nav-icon">🎭</div>
+                <div class="side-nav-text">Hero Profile</div>
+            </a>
+            <a href="#theme" class="side-nav-item" onclick="toggleTheme()">
+                <div class="side-nav-icon">🌟</div>
+                <div class="side-nav-text">Power Mode</div>
+            </a>
+            <a href="@Url.Action("Contact", "Home")" class="side-nav-item">
+                <div class="side-nav-icon">📺</div>
+                <div class="side-nav-text">HQ Contact</div>
+            </a>
+        </nav>
+    </div>
+
+    <!-- Side Navigation Overlay -->
+    <div class="side-nav-overlay" id="sideNavOverlay"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <button class="menu-toggle" onclick="toggleSideNav()">☰</button>
+                <div class="nav-logo">
+                    <h2>🎬 CINEHUB 🎬</h2>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="@Url.Action("Index", "Movie")" class="nav-link">HOME BASE</a>
+                <a href="@Url.Action("Index", "Movie")#favorites" class="nav-link">HERO PICKS</a>
+                <a href="@Url.Action("Contact", "Home")" class="nav-link">HQ CONTACT</a>
+            </div>
+            <div class="nav-actions">
+                <button class="search-btn" onclick="toggleSearch()">🔍</button>
+                <button class="theme-btn" onclick="toggleTheme()">🌙</button>
+                <button class="profile-btn" onclick="toggleProfile()">🦸</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Search Bar -->
+    <div class="search-container" id="searchContainer">
+        <div class="search-box">
+            <input type="text" placeholder="Search for epic movies..." id="searchInput">
+            <div class="search-filters">
+                <select id="categoryFilter">
+                    <option value="">Category</option>
+                    <option value="action">ACTION! 💥</option>
+                    <option value="drama">DRAMA 🎭</option>
+                    <option value="comedy">COMEDY 😂</option>
+                    <option value="thriller">THRILLER ⚡</option>
+                </select>
+                <select id="timeFilter">
+                    <option value="">Era</option>
+                    <option value="2024">2024 🚀</option>
+                    <option value="2023">2023 ⭐</option>
+                    <option value="2022">2022 🎊</option>
+                </select>
+                <select id="languageFilter">
+                    <option value="">Language</option>
+                    <option value="english">English 🇺🇸</option>
+                    <option value="spanish">Spanish 🇪🇸</option>
+                    <option value="french">French 🇫🇷</option>
+                </select>
+                <select id="scoreFilter">
+                    <option value="">Power Level</option>
+                    <option value="9+">LEGENDARY! 9.0+</option>
+                    <option value="8+">EPIC! 8.0+</option>
+                    <option value="7+">AWESOME! 7.0+</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="mainContent">
+        <!-- Movie Player Section -->
+        <section class="player-section">
+            <div class="player-container">
+                <!-- Movie Title -->
+                <h1 class="movie-title" id="movieTitle">🦸 EPIC MASTERPIECE 🦸</h1>
+
+                <!-- Video Player -->
+                <div class="video-player-container">
+                    <div class="video-player" id="videoPlayer">
+                        <div class="video-placeholder">
+                            <!-- Play button removed from here -->
+                            <div class="video-overlay" id="videoOverlay">
+                                <h2 id="videoTitle">🦸 EPIC MASTERPIECE 🦸</h2>
+                                <p>🎬 EPIC ADVENTURE AWAITS! 🎬</p>
+                            </div>
+                        </div>
+
+                        <!-- Video Controls -->
+                        <div class="video-controls" id="videoControls">
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progressFill"></div>
+                                    <div class="progress-handle" id="progressHandle"></div>
+                                </div>
+                                <div class="time-display">
+                                    <span id="currentTime">00:00</span> / <span id="totalTime">02:35:00</span>
+                                </div>
+                            </div>
+
+                            <div class="control-buttons">
+                                <div class="left-controls">
+                                    <button class="control-btn" onclick="togglePlay()" id="playBtn">▶</button>
+                                    <button class="control-btn" onclick="skipBackward()">⏪ 10s</button>
+                                    <button class="control-btn" onclick="skipForward()">⏩ 10s</button>
+                                    <div class="volume-control">
+                                        <button class="control-btn" onclick="toggleMute()" id="volumeBtn">🔊</button>
+                                        <div class="volume-slider">
+                                            <input type="range" min="0" max="100" value="70" id="volumeSlider">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="center-controls">
+                                    <button class="control-btn act-btn" data-act="1">💥 ACT 1</button>
+                                    <button class="control-btn act-btn" data-act="2">⚡ ACT 2</button>
+                                    <button class="control-btn act-btn" data-act="3">🔥 ACT 3</button>
+                                    <button class="control-btn act-btn" data-act="4">🌟 FINALE</button>
+                                </div>
+
+                                <div class="right-controls">
+                                    <button class="control-btn" onclick="toggleCaptions()">💬 CC</button>
+                                    <button class="control-btn" onclick="changeQuality()">📺 HD</button>
+                                    <button class="control-btn" onclick="toggleFullscreen()">🔳 FULL</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Movie Information Panel -->
+                <div class="movie-info-panel">
+                    <div class="movie-metadata">
+                        <div class="movie-details">
+                            <div class="movie-score-large" id="movieScore">9.2</div>
+                            <div class="movie-categories" id="movieCategories">
+                                <span class="category-tag">ACTION 💥</span>
+                                <span class="category-tag">ADVENTURE ⚡</span>
+                                <span class="category-tag">EPIC 🌟</span>
+                            </div>
+                            <div class="movie-description">
+                                <p id="movieDescription">🦸 AN EPIC TALE OF HEROES, VILLAINS, AND LEGENDARY BATTLES! This masterpiece takes you on an incredible journey through stunning visuals and heart-pounding action that will keep you on the edge of your seat from beginning to end! 🦸</p>
+                            </div>
+                        </div>
+
+                        <div class="movie-actions">
+                            <button class="btn-primary" onclick="addToFavorites(this)">💥 ADD TO COLLECTION</button>
+                            <button class="btn-secondary" onclick="shareMovie()">📤 SHARE EPIC</button>
+                            <button class="btn-secondary" onclick="downloadMovie()">⬇ DOWNLOAD HERO</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Comments Section -->
+        <section class="comments-section-player">
+            <div class="comments-container">
+                <h3>💬 HERO REVIEWS 💬 <span class="comment-count">(245)</span></h3>
+
+                <!-- Comment Form -->
+                <div class="comment-form">
+                    <div class="comment-input-container">
+                        <div class="user-avatar">🦸</div>
+                        <textarea placeholder="Share your EPIC thoughts about this LEGENDARY movie..." id="newComment" rows="3"></textarea>
+                    </div>
+                    <div class="comment-actions">
+                        <button class="btn-secondary" onclick="cancelComment()">❌ CANCEL</button>
+                        <button class="btn-primary" onclick="addComment()">💥 POST REVIEW</button>
+                    </div>
+                </div>
+
+                <!-- Comments List -->
+                <div class="comments-list" id="commentsList">
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <div class="comment-avatar">JD</div>
+                            <div class="comment-info">
+                                <div class="comment-author">John Doe</div>
+                                <div class="comment-time">2 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="comment-content">
+                            🔥 ABSOLUTELY MIND-BLOWING cinematography and INCREDIBLE storyline! The visual effects were BREATHTAKING and the character development was PHENOMENAL! Definitely worth watching multiple times! 💥💥💥
+                        </div>
+                        <div class="comment-actions-inline">
+                            <button class="comment-action-btn" onclick="likeComment(this)">👍 24</button>
+                            <button class="comment-action-btn" onclick="replyComment(this)">↩ Reply</button>
+                        </div>
+                    </div>
+
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <div class="comment-avatar">AS</div>
+                            <div class="comment-info">
+                                <div class="comment-author">Alex Smith</div>
+                                <div class="comment-time">5 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="comment-content">
+                            ⚡ One of the BEST superhero movies I've seen this year! The acting is PHENOMENAL and the plot twists kept me guessing until the very end! LEGENDARY! ⚡⚡⚡
+                        </div>
+                        <div class="comment-actions-inline">
+                            <button class="comment-action-btn" onclick="likeComment(this)">👍 18</button>
+                            <button class="comment-action-btn" onclick="replyComment(this)">↩ Reply</button>
+                        </div>
+                    </div>
+
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <div class="comment-avatar">SJ</div>
+                            <div class="comment-info">
+                                <div class="comment-author">Sarah Johnson</div>
+                                <div class="comment-time">1 day ago</div>
+                            </div>
+                        </div>
+                        <div class="comment-content">
+                            🌟 VISUALLY STUNNING and emotionally CAPTIVATING! A true MASTERPIECE! The soundtrack perfectly complements every epic scene! This is what CINEMA is all about! 🌟🌟🌟
+                        </div>
+                        <div class="comment-actions-inline">
+                            <button class="comment-action-btn liked" onclick="likeComment(this)">👍 42</button>
+                            <button class="comment-action-btn" onclick="replyComment(this)">↩ Reply</button>
+                        </div>
+                    </div>
+
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <div class="comment-avatar">MT</div>
+                            <div class="comment-info">
+                                <div class="comment-author">Mike Turner</div>
+                                <div class="comment-time">2 days ago</div>
+                            </div>
+                        </div>
+                        <div class="comment-content">
+                            💥 The plot twists kept me guessing until the very end! HIGHLY RECOMMENDED! Great performance by all the heroes! Can't wait for the sequel! BRING IT ON! 💥💥💥
+                        </div>
+                        <div class="comment-actions-inline">
+                            <button class="comment-action-btn" onclick="likeComment(this)">👍 31</button>
+                            <button class="comment-action-btn" onclick="replyComment(this)">↩ Reply</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Load More Comments -->
+                <div class="load-more-container">
+                    <button class="btn-secondary load-more-btn" onclick="loadMoreComments()">⚡ LOAD MORE HERO REVIEWS ⚡</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content profile-content">
+            <div class="profile-avatar">🦸</div>
+            <div class="profile-info">
+                <h3>Hello Hero</h3>
+                <div class="profile-stats">
+                    <span>HERO MEMBER</span>
+                    <span>UPGRADE TO LEGENDARY</span>
+                </div>
+                <div class="profile-actions">
+                    <button onclick="changeAvatar()">CHANGE HERO AVATAR</button>
+                    <button onclick="changePassword()">CHANGE SECRET CODE</button>
+                    <button onclick="logout()">EXIT HERO MODE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Details Button -->
+    <button class="fab back-btn" onclick="goBackToDetails()">←</button>
+
+    <script src="~/js/comic-player.js"></script>
+</body>
+</html>

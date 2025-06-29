@@ -1,0 +1,32 @@
+﻿@model Film_website.Models.User
+@{
+    ViewData["Title"] = "Thông tin cá nhân";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Thông tin cá nhân</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Họ tên:</strong></div>
+                        <div class="col-sm-9">@Model.FirstName @Model.LastName</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Email:</strong></div>
+                        <div class="col-sm-9">@Model.Email</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-3"><strong>Ngày tạo:</strong></div>
+                        <div class="col-sm-9">@Model.CreatedAt.ToString("dd/MM/yyyy")</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

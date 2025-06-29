@@ -1,0 +1,1063 @@
+﻿@model Dictionary<Film_website.Models.User, IList<string>>
+@{
+    ViewData["Title"] = "Trang quản trị";
+}
+
+<!-- Main Admin Cards Section (Original Layout) -->
+<div class="container" id="mainAdminSection">
+    <div class="row">
+        <div class="col-12">
+            <h1>Trang quản trị</h1>
+            <p class="lead">@ViewBag.Message</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Quản lý người dùng</h5>
+                </div>
+                <div class="card-body">
+                    <p>Xem và quản lý tài khoản người dùng.</p>
+                    <button class="btn btn-primary" onclick="showUserManagement()">Quản lý User</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Quản lý phim</h5>
+                </div>
+                <div class="card-body">
+                    <p>Thêm, sửa, xóa phim trong hệ thống.</p>
+                    <button class="btn btn-primary">
+                        <a href="@Url.Action("ManageMovies", "Admin")" class="btn btn-primary">Quản lý phim</a>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Translator Card -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card translator-card">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h5>🌐 AI Translator</h5>
+                </div>
+                <div class="card-body">
+                    <p>Dịch phim tự động bằng công nghệ AI tiên tiến.</p>
+                    <a href="@Url.Action("Translator", "Admin")" class="btn btn-success translator-btn">
+                        🚀 Bắt đầu dịch
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Bảng điều khiển nâng cao</h5>
+                </div>
+                <div class="card-body">
+                    <p>Truy cập trang quản trị đầy đủ tính năng.</p>
+                    <a href="@Url.Action("Dashboard", "Admin")" class="btn btn-info">
+                        🎛️ Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Management Section (Hidden by default) -->
+<div class="container-fluid" id="userManagementSection" style="display: none;">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-gradient-primary text-white py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h2 class="mb-0">👥 User Management</h2>
+                            <small class="opacity-75">Manage all user accounts</small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-light text-dark fs-6 me-3">
+                                Total Users: <strong>@(Model?.Count ?? 0)</strong>
+                            </span>
+                            <button class="btn btn-outline-light btn-sm" onclick="backToMainAdmin()">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Admin
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage as string))
+                {
+                    <div class="alert alert-danger alert-dismissible fade show m-3" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        @ViewBag.ErrorMessage
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <div class="card-body p-0">
+                    @if (Model != null && Model.Any())
+                    {
+                        <!-- Search and Filter Section -->
+                        <div class="p-4 border-bottom">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0">
+                                            <i class="fas fa-search text-muted"></i>
+                                        </span>
+                                        <input type="text" class="form-control border-start-0"
+                                               id="userSearch" placeholder="Search by name, email, or username...">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select" id="roleFilter">
+                                        <option value="">All Roles</option>
+                                        <option value="Admin">Admin</option>
+                                        <option value="User">User</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn btn-outline-primary w-100" onclick="exportUsers()">
+                                        <i class="fas fa-download me-2"></i>Export
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Users Table -->
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="usersTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col" class="border-0 ps-4">
+                                            <input type="checkbox" class="form-check-input" id="selectAll">
+                                        </th>
+                                        <th scope="col" class="border-0">User Info</th>
+                                        <th scope="col" class="border-0">Contact</th>
+                                        <th scope="col" class="border-0">Role</th>
+                                        <th scope="col" class="border-0">Status</th>
+                                        <th scope="col" class="border-0">Joined</th>
+                                        <th scope="col" class="border-0 text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var userRole in Model)
+                                    {
+                                        var user = userRole.Key;
+                                        var roles = userRole.Value;
+                                        <tr class="user-row" data-user-id="@user.Id">
+                                            <td class="ps-4">
+                                                <input type="checkbox" class="form-check-input user-checkbox"
+                                                       value="@user.Id">
+                                            </td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-circle me-3">
+                                                        @{
+                                                            var firstInitial = !string.IsNullOrEmpty(user.FirstName) ? user.FirstName.First().ToString() : "";
+                                                            var lastInitial = !string.IsNullOrEmpty(user.LastName) ? user.LastName.First().ToString() : "";
+                                                            var initials = firstInitial + lastInitial;
+                                                        }
+                                                        <span class="text-white fw-bold">@initials</span>
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="mb-1 fw-semibold">
+                                                            @user.FirstName @user.LastName
+                                                        </h6>
+                                                        <small class="text-muted">@user.DisplayUserName</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <div class="mb-1">
+                                                        <i class="fas fa-envelope text-muted me-2"></i>
+                                                        <span class="small">@user.Email</span>
+                                                    </div>
+                                                    @if (!string.IsNullOrEmpty(user.PhoneNumber))
+                                                    {
+                                                        <div>
+                                                            <i class="fas fa-phone text-muted me-2"></i>
+                                                            <span class="small">@user.PhoneNumber</span>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if (roles.Any())
+                                                {
+                                                    @foreach (var role in roles)
+                                                    {
+                                                        <span class="badge @(role == "Admin" ? "bg-danger" : "bg-primary") me-1">
+                                                            @role
+                                                        </span>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-secondary">No Role</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (user.EmailConfirmed)
+                                                {
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-check-circle me-1"></i>Active
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning">
+                                                        <i class="fas fa-clock me-1"></i>Pending
+                                                    </span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    @user.CreatedAt.ToString("dd/MM/yyyy")
+                                                </small>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <button type="button" class="btn btn-outline-primary"
+                                                            onclick="viewUser('@user.Id')" title="View Details">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-warning"
+                                                            onclick="editUser('@user.Id')" title="Edit User">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    @if (!roles.Contains("Admin"))
+                                                    {
+                                                        <button type="button" class="btn btn-outline-danger"
+                                                                onclick="deleteUser('@user.Id')" title="Delete User">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="d-flex justify-content-between align-items-center p-4 border-top">
+                            <small class="text-muted">
+                                Showing <span id="showingStart">1</span> to <span id="showingEnd">@Model.Count</span>
+                                of <span id="totalEntries">@Model.Count</span> entries
+                            </small>
+                            <nav aria-label="User pagination">
+                                <ul class="pagination pagination-sm mb-0" id="userPagination">
+                                    <!-- Pagination will be generated by JavaScript -->
+                                </ul>
+                            </nav>
+                        </div>
+                    }
+                    else
+                    {
+                        <!-- Empty State -->
+                        <div class="text-center py-5">
+                            <i class="fas fa-users text-muted" style="font-size: 4rem;"></i>
+                            <h4 class="mt-3 text-muted">No Users Found</h4>
+                            <p class="text-muted">There are no users in the database yet.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade" id="viewUserModal" tabindex="-1" aria-labelledby="viewUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-primary text-white">
+                <h5 class="modal-title" id="viewUserModalLabel">
+                    <i class="fas fa-user-circle me-2"></i>User Details
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <!-- User Header -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle-large me-4">
+                                    <span class="text-white fw-bold fs-3" id="viewUserAvatar">AB</span>
+                                </div>
+                                <div>
+                                    <h3 class="mb-1" id="viewUserName">John Doe</h3>
+                                    <p class="text-muted mb-2">@@<span id="viewUserUsername">johndoe</span></p>
+                                    <div id="viewUserRoles">
+                                        <span class="badge bg-primary">User</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- User Information -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-card">
+                                <h6 class="info-title">
+                                    <i class="fas fa-id-card text-primary me-2"></i>Personal Information
+                                </h6>
+                                <div class="info-item">
+                                    <label class="info-label">Full Name:</label>
+                                    <span class="info-value" id="viewUserName2">John Doe</span>
+                                </div>
+                                <div class="info-item">
+                                    <label class="info-label">Username:</label>
+                                    <span class="info-value" id="viewUserUsername2">johndoe</span>
+                                </div>
+                                <div class="info-item">
+                                    <label class="info-label">User ID:</label>
+                                    <span class="info-value font-monospace" id="viewUserId">12345</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-card">
+                                <h6 class="info-title">
+                                    <i class="fas fa-envelope text-success me-2"></i>Contact Information
+                                </h6>
+                                <div class="info-item">
+                                    <label class="info-label">Email:</label>
+                                    <span class="info-value" id="viewUserEmail">john@@example.com</span>
+                                </div>
+                                <div class="info-item">
+                                    <label class="info-label">Phone:</label>
+                                    <span class="info-value" id="viewUserPhone">Not provided</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="info-card">
+                                <h6 class="info-title">
+                                    <i class="fas fa-shield-alt text-warning me-2"></i>Account Status
+                                </h6>
+                                <div class="info-item">
+                                    <label class="info-label">Status:</label>
+                                    <span class="info-value" id="viewUserStatus">
+                                        <span class="badge bg-success">Active</span>
+                                    </span>
+                                </div>
+                                <div class="info-item">
+                                    <label class="info-label">Roles:</label>
+                                    <span class="info-value" id="viewUserRoles2">
+                                        <span class="badge bg-primary">User</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-card">
+                                <h6 class="info-title">
+                                    <i class="fas fa-calendar-alt text-info me-2"></i>Account History
+                                </h6>
+                                <div class="info-item">
+                                    <label class="info-label">Joined:</label>
+                                    <span class="info-value" id="viewUserJoined">25/12/2024</span>
+                                </div>
+                                <div class="info-item">
+                                    <label class="info-label">Last Login:</label>
+                                    <span class="info-value text-muted">Not available</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Close
+                </button>
+                <button type="button" class="btn btn-warning" onclick="editUserFromModal()">
+                    <i class="fas fa-edit me-2"></i>Edit User
+                </button>
+                <button type="button" class="btn btn-info" onclick="viewUserActivity()">
+                    <i class="fas fa-history me-2"></i>View Activity
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Activity Modal -->
+<div class="modal fade" id="userActivityModal" tabindex="-1" aria-labelledby="userActivityModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-primary text-white">
+                <h5 class="modal-title" id="userActivityModalLabel">
+                    <i class="fas fa-history me-2"></i>User Activity Log
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Loading Spinner -->
+                <div id="activityLoadingSpinner" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Loading user activities...</p>
+                </div>
+
+                <!-- Error Message -->
+                <div id="activityErrorMessage" class="alert alert-danger" style="display: none;">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Failed to load user activities. Please try again.
+                </div>
+
+                <!-- Activity Content -->
+                <div id="activityContent" style="display: none;">
+                    <!-- User Header -->
+                    <div class="activity-header mb-4">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6 class="text-muted mb-1">Activity Log for:</h6>
+                                <h4 class="mb-1" id="activityUserName">John Doe</h4>
+                                <p class="text-muted mb-0">
+                                    <i class="fas fa-envelope me-2"></i><span id="activityUserEmail">john@example.com</span>
+                                    <span class="mx-2">•</span>
+                                    <i class="fas fa-user me-2"></i>@@<span id="activityUserUsername">johndoe</span>
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <div class="activity-stats">
+                                    <div class="stat-card">
+                                        <h3 class="stat-number" id="activityTotalCount">0</h3>
+                                        <p class="stat-label">Total Activities</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Filter -->
+                    <div class="activity-filters mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <select class="form-select" id="activityTypeFilter">
+                                    <option value="">All Activity Types</option>
+                                    <option value="Login">Login</option>
+                                    <option value="Logout">Logout</option>
+                                    <option value="Profile Update">Profile Update</option>
+                                    <option value="Password Change">Password Change</option>
+                                    <option value="Admin Access">Admin Access</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="date" class="form-control" id="activityDateFrom" placeholder="From Date">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="date" class="form-control" id="activityDateTo" placeholder="To Date">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activities List -->
+                    <div class="activities-container">
+                        <div id="activitiesContainer">
+                            <!-- Activities will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Close
+                </button>
+                <button type="button" class="btn btn-primary" onclick="exportUserActivities()">
+                    <i class="fas fa-download me-2"></i>Export Activities
+                </button>
+                <button type="button" class="btn btn-info" onclick="refreshActivities()">
+                    <i class="fas fa-sync-alt me-2"></i>Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .translator-card {
+        border: 2px solid #28a745;
+        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .translator-card::before {
+        content: '✨';
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 1.5rem;
+        z-index: 1;
+    }
+
+    .translator-btn {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        border: none;
+        font-weight: bold;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
+    }
+
+    .translator-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+
+    .avatar-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .table tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+
+    .btn-group-sm > .btn {
+        padding: 0.25rem 0.5rem;
+    }
+
+    .user-row.filtered-out {
+        display: none;
+    }
+
+    /* Modal Styles */
+    .avatar-circle-large {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .info-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid #667eea;
+    }
+
+    .info-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: #495057;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 0.5rem;
+    }
+
+    .info-item {
+        margin-bottom: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .info-label {
+        font-weight: 500;
+        color: #6c757d;
+        margin-bottom: 0;
+        min-width: 100px;
+    }
+
+    .info-value {
+        font-weight: 500;
+        color: #212529;
+        text-align: right;
+        flex: 1;
+    }
+
+    .modal-content {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        border-radius: 12px 12px 0 0;
+        border-bottom: none;
+        padding: 1.5rem;
+    }
+
+    .modal-body {
+        padding: 2rem;
+    }
+
+    .modal-footer {
+        border-top: 1px solid #dee2e6;
+        padding: 1.5rem;
+        border-radius: 0 0 12px 12px;
+    }
+
+    /* Smooth transitions */
+    #mainAdminSection, #userManagementSection {
+        transition: all 0.3s ease-in-out;
+    }
+
+    /* Activity Modal Styles */
+    .activity-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        padding: 2rem;
+        border-left: 4px solid #667eea;
+    }
+
+    .activity-stats .stat-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0;
+    }
+
+    .activity-filters {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+
+    .activities-container {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        background: white;
+    }
+
+    .activity-item {
+        padding: 1.5rem;
+        border-bottom: 1px solid #f1f3f4;
+        transition: background-color 0.2s ease;
+    }
+
+    .activity-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .activity-icon i {
+        color: white;
+        font-size: 1rem;
+    }
+
+    .activity-icon.bg-purple {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .activity-details {
+        flex-grow: 1;
+    }
+
+    .activity-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #212529;
+    }
+
+    .activity-description {
+        color: #6c757d;
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+    }
+
+    .activity-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .meta-item {
+        font-size: 0.85rem;
+        color: #8e9297;
+        display: flex;
+        align-items: center;
+    }
+
+    .meta-item i {
+        opacity: 0.7;
+    }
+
+    /* Responsive design for activity modal */
+    @@media (max-width: 768px) {
+        .activity-header .row {
+            text-align: center;
+        }
+
+        .activity-meta {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .activities-container {
+            max-height: 300px;
+        }
+    }
+</style>
+
+<script>
+    // Toggle between main admin view and user management view
+    function showUserManagement() {
+        document.getElementById('mainAdminSection').style.display = 'none';
+        document.getElementById('userManagementSection').style.display = 'block';
+
+        // Smooth scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function backToMainAdmin() {
+        document.getElementById('userManagementSection').style.display = 'none';
+        document.getElementById('mainAdminSection').style.display = 'block';
+
+        // Smooth scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // User management functionality (only loaded when user management is shown)
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality
+        const searchInput = document.getElementById('userSearch');
+        const roleFilter = document.getElementById('roleFilter');
+        const userRows = document.querySelectorAll('.user-row');
+
+        function filterUsers() {
+            const searchTerm = searchInput?.value.toLowerCase() || '';
+            const selectedRole = roleFilter?.value || '';
+
+            userRows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const roleColumn = row.querySelector('td:nth-child(4)')?.textContent || '';
+
+                const matchesSearch = text.includes(searchTerm);
+                const matchesRole = !selectedRole || roleColumn.includes(selectedRole);
+
+                if (matchesSearch && matchesRole) {
+                    row.classList.remove('filtered-out');
+                } else {
+                    row.classList.add('filtered-out');
+                }
+            });
+
+            updatePaginationInfo();
+        }
+
+        if (searchInput) searchInput.addEventListener('input', filterUsers);
+        if (roleFilter) roleFilter.addEventListener('change', filterUsers);
+
+        // Select all functionality
+        const selectAllCheckbox = document.getElementById('selectAll');
+        const userCheckboxes = document.querySelectorAll('.user-checkbox');
+
+        if (selectAllCheckbox) {
+            selectAllCheckbox.addEventListener('change', function() {
+                userCheckboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+            });
+        }
+
+        function updatePaginationInfo() {
+            const visibleRows = document.querySelectorAll('.user-row:not(.filtered-out)').length;
+            const showingEndElement = document.getElementById('showingEnd');
+            const totalEntriesElement = document.getElementById('totalEntries');
+
+            if (showingEndElement) showingEndElement.textContent = visibleRows;
+            if (totalEntriesElement) totalEntriesElement.textContent = visibleRows;
+        }
+    });
+
+    // User action functions
+    function viewUser(userId) {
+        // Find user data from the table row
+        const userRow = document.querySelector(`tr[data-user-id="${userId}"]`);
+        if (!userRow) return;
+
+        // Extract user information from the table row
+        const userInfo = userRow.querySelector('td:nth-child(2)');
+        const contactInfo = userRow.querySelector('td:nth-child(3)');
+        const roleInfo = userRow.querySelector('td:nth-child(4)');
+        const statusInfo = userRow.querySelector('td:nth-child(5)');
+        const joinedInfo = userRow.querySelector('td:nth-child(6)');
+
+        // Get user details
+        const fullName = userInfo.querySelector('h6').textContent.trim();
+        const username = userInfo.querySelector('small').textContent.trim();
+        const email = contactInfo.querySelector('.fa-envelope').parentNode.textContent.replace('✉', '').trim();
+        const phone = contactInfo.querySelector('.fa-phone')?.parentNode.textContent.replace('📞', '').trim() || 'Not provided';
+        const roles = Array.from(roleInfo.querySelectorAll('.badge')).map(badge => badge.textContent.trim()).join(', ');
+        const status = statusInfo.querySelector('.badge').textContent.trim();
+        const joinDate = joinedInfo.textContent.trim();
+
+        // Populate modal - Header section
+        document.getElementById('viewUserName').textContent = fullName;
+        document.getElementById('viewUserUsername').textContent = username;
+        document.getElementById('viewUserRoles').innerHTML = roleInfo.innerHTML;
+
+        // Populate modal - Information cards
+        document.getElementById('viewUserName2').textContent = fullName;
+        document.getElementById('viewUserUsername2').textContent = username;
+        document.getElementById('viewUserEmail').textContent = email;
+        document.getElementById('viewUserPhone').textContent = phone;
+        document.getElementById('viewUserStatus').innerHTML = statusInfo.innerHTML;
+        document.getElementById('viewUserRoles2').innerHTML = roleInfo.innerHTML;
+        document.getElementById('viewUserJoined').textContent = joinDate;
+        document.getElementById('viewUserId').textContent = userId;
+
+        // Set avatar initials
+        const avatarText = userInfo.querySelector('.avatar-circle span').textContent;
+        document.getElementById('viewUserAvatar').textContent = avatarText;
+
+        // Store current user ID for modal actions
+        document.getElementById('viewUserModal').setAttribute('data-user-id', userId);
+
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('viewUserModal'));
+        modal.show();
+    }
+
+    // Modal action functions
+    function editUserFromModal() {
+        const userId = document.getElementById('viewUserModal').getAttribute('data-user-id');
+        // Close the view modal first
+        const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewUserModal'));
+        if (viewModal) {
+            viewModal.hide();
+        }
+
+        // Then call edit function
+        setTimeout(() => {
+            editUser(userId);
+        }, 300);
+    }
+
+    function viewUserActivity() {
+        const userId = document.getElementById('viewUserModal').getAttribute('data-user-id');
+
+        // Close the user details modal
+        const userModal = bootstrap.Modal.getInstance(document.getElementById('viewUserModal'));
+        if (userModal) {
+            userModal.hide();
+        }
+
+        // Load activities and show activity modal
+        setTimeout(() => {
+            loadUserActivities(userId);
+        }, 300);
+    }
+
+    // Load and display user activities
+    async function loadUserActivities(userId) {
+        try {
+            // Show loading state
+            document.getElementById('activityLoadingSpinner').style.display = 'block';
+            document.getElementById('activityContent').style.display = 'none';
+            document.getElementById('activityErrorMessage').style.display = 'none';
+
+            // Show the modal
+            const activityModal = new bootstrap.Modal(document.getElementById('userActivityModal'));
+            activityModal.show();
+
+            // Fetch activities
+            const response = await fetch(`/Admin/GetUserActivities?userId=${userId}`);
+
+            if (!response.ok) {
+                throw new Error('Failed to load activities');
+            }
+
+            const data = await response.json();
+
+            // Hide loading and show content
+            document.getElementById('activityLoadingSpinner').style.display = 'none';
+            document.getElementById('activityContent').style.display = 'block';
+
+            // Populate user info
+            if (data.user) {
+                document.getElementById('activityUserName').textContent = data.user.name;
+                document.getElementById('activityUserEmail').textContent = data.user.email;
+                document.getElementById('activityUserUsername').textContent = data.user.username;
+                document.getElementById('activityTotalCount').textContent = data.totalCount;
+            }
+
+            // Populate activities
+            const activitiesContainer = document.getElementById('activitiesContainer');
+            activitiesContainer.innerHTML = '';
+
+            if (data.activities && data.activities.length > 0) {
+                data.activities.forEach(activity => {
+                    const activityElement = createActivityElement(activity);
+                    activitiesContainer.appendChild(activityElement);
+                });
+            } else {
+                activitiesContainer.innerHTML = `
+                    <div class="text-center py-4">
+                        <i class="fas fa-history text-muted" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3 text-muted">No Activities Found</h5>
+                        <p class="text-muted">This user has no recorded activities yet.</p>
+                    </div>
+                `;
+            }
+
+        } catch (error) {
+            console.error('Error loading activities:', error);
+
+            // Hide loading and show error
+            document.getElementById('activityLoadingSpinner').style.display = 'none';
+            document.getElementById('activityContent').style.display = 'none';
+            document.getElementById('activityErrorMessage').style.display = 'block';
+        }
+    }
+
+    // Create activity element
+    function createActivityElement(activity) {
+        const div = document.createElement('div');
+        div.className = 'activity-item';
+
+        // Get activity icon and color based on type
+        const { icon, color } = getActivityIconAndColor(activity.activityType);
+
+        div.innerHTML = `
+            <div class="d-flex align-items-start">
+                <div class="activity-icon ${color}">
+                    <i class="fas ${icon}"></i>
+                </div>
+                <div class="activity-details flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h6 class="activity-title">${activity.activityType}</h6>
+                            <p class="activity-description">${activity.description}</p>
+                            <div class="activity-meta">
+                                <span class="meta-item">
+                                    <i class="fas fa-clock me-1"></i>${activity.createdAt}
+                                </span>
+                                ${activity.ipAddress ? `
+                                    <span class="meta-item">
+                                        <i class="fas fa-globe me-1"></i>${activity.ipAddress}
+                                    </span>
+                                ` : ''}
+                                <span class="meta-item">
+                                    <i class="fas fa-map-marker-alt me-1"></i>${activity.location}
+                                </span>
+                            </div>
+                        </div>
+                        <span class="badge bg-secondary">${activity.activityType}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        return div;
+    }
+
+    // Get icon and color for activity type
+    function getActivityIconAndColor(activityType) {
+        const iconMap = {
+            'Login': { icon: 'fa-sign-in-alt', color: 'bg-success' },
+            'Logout': { icon: 'fa-sign-out-alt', color: 'bg-secondary' },
+            'Register': { icon: 'fa-user-plus', color: 'bg-primary' },
+            'Profile Update': { icon: 'fa-user-edit', color: 'bg-info' },
+            'Password Change': { icon: 'fa-key', color: 'bg-warning' },
+            'Password Reset': { icon: 'fa-unlock-alt', color: 'bg-warning' },
+            'Role Changed': { icon: 'fa-shield-alt', color: 'bg-danger' },
+            'Admin Access': { icon: 'fa-crown', color: 'bg-purple' },
+            'Data Export': { icon: 'fa-download', color: 'bg-dark' },
+            'Movie Viewed': { icon: 'fa-play', color: 'bg-success' }
+        };
+
+        return iconMap[activityType] || { icon: 'fa-circle', color: 'bg-secondary' };
+    }
+
+    function editUser(userId) {
+        console.log('Edit user:', userId);
+        alert('Edit user functionality will be implemented in the next step');
+    }
+
+    function deleteUser(userId) {
+        if (confirm('Are you sure you want to delete this user?')) {
+            console.log('Delete user:', userId);
+            alert('Delete user functionality will be implemented in the next step');
+        }
+    }
+
+    function exportUsers() {
+        console.log('Export users');
+        alert('Export functionality will be implemented in the next step');
+    }
+
+    // Additional activity modal functions
+    function refreshActivities() {
+        const userId = document.getElementById('viewUserModal')?.getAttribute('data-user-id');
+        if (userId) {
+            loadUserActivities(userId);
+        }
+    }
+
+    function exportUserActivities() {
+        const userId = document.getElementById('viewUserModal')?.getAttribute('data-user-id');
+        console.log('Export activities for user:', userId);
+        alert('Export activities functionality will be implemented in a future update');
+    }
+</script>

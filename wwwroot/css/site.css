@@ -1,0 +1,431 @@
+﻿/* ========== LAYOUT FIXES - Footer và Navigation ========== */
+
+/* Body layout với flexbox để footer luôn ở dưới */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #141414, #0d0d0d);
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Header fixed position */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1030;
+    background: linear-gradient(135deg, rgba(20,20,20,0.95), rgba(13,13,13,0.95));
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Main content area */
+main {
+    flex: 1;
+    margin-top: 80px; /* Space for fixed header */
+    padding: 2rem 0;
+    min-height: calc(100vh - 160px); /* Ensure minimum height */
+}
+
+/* Footer luôn ở dưới cùng */
+footer {
+    margin-top: auto;
+    background: linear-gradient(135deg, #0d0d0d, #141414) !important;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding: 2rem 0 1rem 0;
+}
+
+/* ========== NAVBAR IMPROVEMENTS ========== */
+.navbar {
+    padding: 1rem 0;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #e50914 !important;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+    .navbar-brand:hover {
+        color: #ffd700 !important;
+        transform: scale(1.05);
+    }
+
+/* Navigation links styling */
+.nav-link {
+    color: #ffffff !important;
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    margin: 0 0.25rem;
+}
+
+    .nav-link:hover {
+        color: #ffd700 !important;
+        background: rgba(255,255,255,0.1);
+        transform: translateY(-2px);
+    }
+
+    .nav-link::before {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background: #e50914;
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+    }
+
+    .nav-link:hover::before {
+        width: 80%;
+    }
+
+/* ========== AUTHENTICATION BUTTONS REPOSITIONING ========== */
+.auth-buttons {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+    .auth-buttons .nav-link {
+        padding: 0.5rem 1.25rem !important;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .auth-buttons .btn-login {
+        background: transparent;
+        color: #ffffff !important;
+        border: 2px solid #e50914;
+    }
+
+        .auth-buttons .btn-login:hover {
+            background: #e50914;
+            color: #ffffff !important;
+            box-shadow: 0 4px 15px rgba(229, 9, 20, 0.4);
+            transform: translateY(-2px);
+        }
+
+    .auth-buttons .btn-register {
+        background: linear-gradient(45deg, #e50914, #ff6b6b);
+        color: #ffffff !important;
+        border: 2px solid transparent;
+    }
+
+        .auth-buttons .btn-register:hover {
+            background: linear-gradient(45deg, #ff6b6b, #e50914);
+            box-shadow: 0 4px 15px rgba(229, 9, 20, 0.5);
+            transform: translateY(-2px);
+        }
+
+/* ========== WELCOME PAGE CONTENT ========== */
+.welcome-container {
+    min-height: calc(100vh - 160px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+}
+
+.welcome-title {
+    font-size: 3rem;
+    font-weight: 700;
+    background: linear-gradient(45deg, #e50914, #ffd700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.welcome-subtitle {
+    font-size: 1.25rem;
+    color: #999999;
+    margin-bottom: 2rem;
+    max-width: 600px;
+}
+
+.welcome-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.welcome-btn {
+    padding: 0.75rem 2rem;
+    border-radius: 30px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.welcome-btn-primary {
+    background: linear-gradient(45deg, #e50914, #ff6b6b);
+    color: white;
+    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.3);
+}
+
+    .welcome-btn-primary:hover {
+        background: linear-gradient(45deg, #ff6b6b, #e50914);
+        box-shadow: 0 6px 20px rgba(229, 9, 20, 0.5);
+        transform: translateY(-3px);
+        color: white;
+    }
+
+.welcome-btn-secondary {
+    background: transparent;
+    color: #ffffff;
+    border: 2px solid #ffffff;
+}
+
+    .welcome-btn-secondary:hover {
+        background: #ffffff;
+        color: #141414;
+        transform: translateY(-3px);
+    }
+
+/* ========== FLOATING LOGOUT BUTTON (Khi đã đăng nhập) ========== */
+.floating-logout {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+    background: linear-gradient(45deg, #e50914, #dc3545);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 20px rgba(229, 9, 20, 0.4);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+    .floating-logout:hover {
+        background: linear-gradient(45deg, #dc3545, #e50914);
+        transform: scale(1.1);
+        box-shadow: 0 6px 25px rgba(229, 9, 20, 0.6);
+        color: white;
+    }
+
+    .floating-logout:active {
+        transform: scale(0.95);
+    }
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 768px) {
+    .welcome-title {
+        font-size: 2rem;
+    }
+
+    .welcome-subtitle {
+        font-size: 1rem;
+    }
+
+    .welcome-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .welcome-btn {
+        width: 200px;
+        justify-content: center;
+    }
+
+    .auth-buttons {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+        .auth-buttons .nav-link {
+            width: 100%;
+            text-align: center;
+            margin: 0.25rem 0;
+        }
+
+    .floating-logout {
+        bottom: 1rem;
+        right: 1rem;
+        width: 50px;
+        height: 50px;
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    main {
+        margin-top: 70px;
+        padding: 1rem 0;
+    }
+
+    .welcome-container {
+        padding: 1rem;
+        min-height: calc(100vh - 140px);
+    }
+
+    .navbar {
+        padding: 0.75rem 0;
+    }
+
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+}
+
+/* ========== SCROLL ENHANCEMENTS ========== */
+.navbar.scrolled {
+    background: linear-gradient(135deg, rgba(20,20,20,0.98), rgba(13,13,13,0.98)) !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    backdrop-filter: blur(15px);
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Hide scrollbar but keep functionality */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #141414;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #e50914;
+    border-radius: 4px;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #ff6b6b;
+    }
+
+/* ========== ANIMATIONS ========== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.slide-in-left {
+    animation: slideInFromLeft 0.8s ease-out;
+}
+
+.slide-in-right {
+    animation: slideInFromRight 0.8s ease-out;
+}
+
+/* ========== LOADING STATES ========== */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: #ffffff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ========== UTILITY CLASSES ========== */
+.text-gradient {
+    background: linear-gradient(45deg, #e50914, #ffd700);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.shadow-glow {
+    box-shadow: 0 0 20px rgba(229, 9, 20, 0.3);
+}
+
+.hover-scale {
+    transition: transform 0.3s ease;
+}
+
+    .hover-scale:hover {
+        transform: scale(1.05);
+    }
+
+.hover-lift {
+    transition: transform 0.3s ease;
+}
+
+    .hover-lift:hover {
+        transform: translateY(-5px);
+    }
