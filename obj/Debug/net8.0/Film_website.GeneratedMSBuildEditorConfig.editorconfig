@@ -17,109 +17,109 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = Film_website
 build_property.RootNamespace = Film_website
-build_property.ProjectDir = E:\Other\Subject\Research\On Going\Movie_website_uses_AI_technology_to_translate_movie-hoangbh\
+build_property.ProjectDir = E:\Other\Subject\Research\Alpha\project-research-personal\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = E:\Other\Subject\Research\On Going\Movie_website_uses_AI_technology_to_translate_movie-hoangbh
+build_property.MSBuildProjectDirectory = E:\Other\Subject\Research\Alpha\project-research-personal
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Account/ForgotPassword.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Account/ForgotPassword.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxGb3Jnb3RQYXNzd29yZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Account/Login.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Account/Profile.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Account/Profile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxQcm9maWxlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Account/Register.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Account/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Account/ResetPassword.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Account/ResetPassword.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxSZXNldFBhc3N3b3JkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Admin/AddMovie.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Admin/AddMovie.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRkTW92aWUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Admin/Dashboard.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Admin/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGFzaGJvYXJkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Admin/EditMovie.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Admin/EditMovie.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRWRpdE1vdmllLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Admin/Index.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Admin/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Admin/ManageMovies.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Admin/ManageMovies.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTWFuYWdlTW92aWVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Admin/SystemSettings.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Admin/SystemSettings.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cU3lzdGVtU2V0dGluZ3MuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Admin/Translator.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Admin/Translator.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVHJhbnNsYXRvci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Admin/UserManagement.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Admin/UserManagement.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVXNlck1hbmFnZW1lbnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Admin/ViewMovie.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Admin/ViewMovie.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVmlld01vdmllLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Home/Index.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Home/Privacy.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Movie/Details.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Movie/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTW92aWVcRGV0YWlscy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Movie/Index.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Movie/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTW92aWVcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Movie/Player.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Movie/Player.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTW92aWVcUGxheWVyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Shared/Error.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Shared/_ValidationScriptsPartial.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/_ViewImports.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/_ViewStart.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Other/Subject/Research/On Going/Movie_website_uses_AI_technology_to_translate_movie-hoangbh/Views/Shared/_Layout.cshtml]
+[E:/Other/Subject/Research/Alpha/project-research-personal/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-52pg0oprgb

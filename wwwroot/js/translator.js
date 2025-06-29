@@ -1,292 +1,532 @@
-﻿// Translator Page JavaScript
-
-// Global variables
-let selectedFile = null;
-let translationInProgress = false;
-let currentProgress = 0;
+﻿// Global variables
+let uploadedMovieFile = null;
+let uploadedSubtitleFile = null;
+let originalSubtitleText = '';
+let translatedSubtitleText = '';
+let isTranslating = false;
 
 // DOM elements
-const uploadArea = document.getElementById('uploadArea');
-const movieFile = document.getElementById('movieFile');
-const downloadBtn = document.getElementById('downloadBtn');
+const movieUploadArea = document.getElementById('movieUploadArea');
+const movieFileInput = document.getElementById('movieFileInput');
+const originalSubtitleUpload = document.getElementById('originalSubtitleUpload');
+const originalSubtitleInput = document.getElementById('originalSubtitleInput');
+const originalTextarea = document.getElementById('originalTextarea');
+const translatedTextarea = document.getElementById('translatedTextarea');
+const translationPlaceholder = document.getElementById('translationPlaceholder');
+const sourceLanguageSelect = document.getElementById('sourceLanguage');
+const targetLanguageSelect = document.getElementById('targetLanguage');
+const swapLanguagesBtn = document.getElementById('swapLanguages');
 const translateBtn = document.getElementById('translateBtn');
-const statusSection = document.getElementById('statusSection');
-const progressFill = document.getElementById('progressFill');
-const progressText = document.getElementById('progressText');
-const statusMessage = document.getElementById('statusMessage');
-const loadingOverlay = document.getElementById('loadingOverlay');
+const clearAllBtn = document.getElementById('clearAllBtn');
+const saveEditsBtn = document.getElementById('saveEditsBtn');
+const autoFormatBtn = document.getElementById('autoFormatBtn');
+const downloadPlaceholder = document.getElementById('downloadPlaceholder');
+const downloadReadyBtn = document.getElementById('downloadReadyBtn');
 const adminNotes = document.getElementById('adminNotes');
+const saveNotesBtn = document.getElementById('saveNotesBtn');
+const clearNotesBtn = document.getElementById('clearNotesBtn');
+const notificationBtn = document.getElementById('notificationBtn');
+const notificationModal = document.getElementById('notificationModal');
+const loadingModal = document.getElementById('loadingModal');
+const loadingText = document.getElementById('loadingText');
+const originalLanguageTag = document.getElementById('originalLanguageTag');
+const translatedLanguageTag = document.getElementById('translatedLanguageTag');
 
-// Initialize page
+// Language names mapping
+const languageNames = {
+    'en': 'English',
+    'vi': 'Vietnamese',
+    'ja': 'Japanese',
+    'ko': 'Korean',
+    'zh': 'Chinese',
+    'es': 'Spanish',
+    'fr': 'French',
+    'de': 'German'
+};
+
+// Initialize the application
 document.addEventListener('DOMContentLoaded', function () {
-    setupFileUpload();
+    initializeEventListeners();
+    initializeDragAndDrop();
+    updateLanguageTags();
     loadSavedNotes();
 });
 
-// File upload setup
-function setupFileUpload() {
-    // Drag and drop functionality
-    uploadArea.addEventListener('dragover', handleDragOver);
-    uploadArea.addEventListener('dragleave', handleDragLeave);
-    uploadArea.addEventListener('drop', handleDrop);
-    uploadArea.addEventListener('click', () => movieFile.click());
+// Initialize event listeners
+function initializeEventListeners() {
+    // File inputs
+    movieFileInput.addEventListener('change', handleMovieFileSelect);
+    originalSubtitleInput.addEventListener('change', handleSubtitleFileSelect);
 
-    // File input change
-    movieFile.addEventListener('change', handleFileSelect);
+    // Language controls
+    sourceLanguageSelect.addEventListener('change', updateLanguageTags);
+    targetLanguageSelect.addEventListener('change', updateLanguageTags);
+    swapLanguagesBtn.addEventListener('click', swapLanguages);
+
+    // Translation controls
+    translateBtn.addEventListener('click', startTranslation);
+    clearAllBtn.addEventListener('click', clearAll);
+
+    // Translation actions
+    saveEditsBtn.addEventListener('click', saveEdits);
+    autoFormatBtn.addEventListener('click', autoFormat);
+    downloadReadyBtn.addEventListener('click', downloadTranslatedFile);
+
+    // Admin notes
+    saveNotesBtn.addEventListener('click', saveNotes);
+    clearNotesBtn.addEventListener('click', clearNotes);
+
+    // Notifications
+    notificationBtn.addEventListener('click', toggleNotifications);
+
+    // Text area changes
+    translatedTextarea.addEventListener('input', onTranslatedTextChange);
 }
 
-function handleDragOver(e) {
-    e.preventDefault();
-    uploadArea.classList.add('drag-over');
+// Initialize drag and drop functionality
+function initializeDragAndDrop() {
+    // Movie file drag and drop
+    setupDragAndDrop(movieUploadArea, handleMovieFilesDrop, ['video/mp4', 'video/avi', 'video/x-msvideo', 'video/quicktime']);
+
+    // Subtitle file drag and drop
+    setupDragAndDrop(originalSubtitleUpload, handleSubtitleFilesDrop, ['text/plain', 'application/x-subrip']);
 }
 
-function handleDragLeave(e) {
-    e.preventDefault();
-    uploadArea.classList.remove('drag-over');
+// Setup drag and drop for an element
+function setupDragAndDrop(element, dropHandler, allowedTypes) {
+    element.addEventListener('dragover', function (e) {
+        e.preventDefault();
+        element.classList.add('drag-over');
+    });
+
+    element.addEventListener('dragleave', function (e) {
+        e.preventDefault();
+        element.classList.remove('drag-over');
+    });
+
+    element.addEventListener('drop', function (e) {
+        e.preventDefault();
+        element.classList.remove('drag-over');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            dropHandler(files[0], allowedTypes);
+        }
+    });
 }
 
-function handleDrop(e) {
-    e.preventDefault();
-    uploadArea.classList.remove('drag-over');
-
-    const files = e.dataTransfer.files;
-    if (files.length > 0) {
-        handleFileSelection(files[0]);
+// Handle movie file selection
+function handleMovieFileSelect(event) {
+    const file = event.target.files[0];
+    if (file) {
+        handleMovieFilesDrop(file, ['video/mp4', 'video/avi', 'video/x-msvideo', 'video/quicktime']);
     }
 }
 
-function handleFileSelect(e) {
-    if (e.target.files.length > 0) {
-        handleFileSelection(e.target.files[0]);
+// Handle movie file drop
+function handleMovieFilesDrop(file, allowedTypes) {
+    if (!validateFileType(file, allowedTypes, ['.mp4', '.avi', '.mkv', '.mov', '.wmv'])) {
+        showNotification('Please select a valid video file (MP4, AVI, MKV, MOV, WMV)', 'error');
+        return;
+    }
+
+    if (file.size > 2147483648) { // 2GB limit
+        showNotification('File size too large. Maximum size is 2GB.', 'error');
+        return;
+    }
+
+    uploadedMovieFile = file;
+    updateMovieUploadDisplay();
+    uploadMovieFile(file);
+}
+
+// Handle subtitle file selection
+function handleSubtitleFileSelect(event) {
+    const file = event.target.files[0];
+    if (file) {
+        handleSubtitleFilesDrop(file, ['text/plain']);
     }
 }
 
-function handleFileSelection(file) {
-    // Validate file type
-    const allowedTypes = ['video/mp4', 'video/avi', 'video/x-msvideo', 'video/quicktime', 'video/x-matroska'];
-    const allowedExtensions = ['.mp4', '.avi', '.mkv', '.mov'];
+// Handle subtitle file drop
+function handleSubtitleFilesDrop(file, allowedTypes) {
+    if (!validateFileType(file, allowedTypes, ['.srt', '.vtt', '.ass', '.ssa', '.sub'])) {
+        showNotification('Please select a valid subtitle file (SRT, VTT, ASS, SSA, SUB)', 'error');
+        return;
+    }
 
+    uploadedSubtitleFile = file;
+    updateSubtitleUploadDisplay();
+    readSubtitleFile(file);
+}
+
+// Validate file type
+function validateFileType(file, allowedMimeTypes, allowedExtensions) {
     const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+    return allowedMimeTypes.includes(file.type) || allowedExtensions.includes(fileExtension);
+}
 
-    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
-        showNotification('Please select a valid video file (MP4, AVI, MKV, MOV)', 'error');
+// Update movie upload display
+function updateMovieUploadDisplay() {
+    const uploadContent = movieUploadArea.querySelector('.upload-placeholder');
+    uploadContent.innerHTML = `
+        <i class="fas fa-check-circle" style="color: #28a745;"></i>
+        <p style="color: #28a745; font-weight: 600;">Movie File Uploaded</p>
+        <p style="font-size: 0.9rem; color: #6c757d;">${uploadedMovieFile.name}</p>
+        <p style="font-size: 0.8rem; color: #6c757d;">${formatFileSize(uploadedMovieFile.size)}</p>
+        <button class="upload-btn" onclick="document.getElementById('movieFileInput').click()">
+            Change File
+        </button>
+    `;
+    movieUploadArea.classList.add('file-uploaded');
+}
+
+// Update subtitle upload display
+function updateSubtitleUploadDisplay() {
+    const uploadContent = originalSubtitleUpload.querySelector('.upload-placeholder');
+    uploadContent.innerHTML = `
+        <i class="fas fa-check-circle" style="color: #28a745;"></i>
+        <p style="color: #28a745; font-weight: 600;">Subtitle Uploaded</p>
+        <p style="font-size: 0.9rem; color: #6c757d;">${uploadedSubtitleFile.name}</p>
+        <button class="upload-btn" onclick="document.getElementById('originalSubtitleInput').click()">
+            Change File
+        </button>
+    `;
+    originalSubtitleUpload.classList.add('file-uploaded');
+}
+
+// Upload movie file to server (mock implementation)
+async function uploadMovieFile(file) {
+    try {
+        // Mock server upload - replace with actual endpoint
+        console.log('Uploading movie file:', file.name);
+        showNotification('Movie file uploaded successfully', 'success');
+    } catch (error) {
+        console.error('Error uploading movie file:', error);
+        showNotification('Failed to upload movie file', 'error');
+    }
+}
+
+// Read subtitle file content
+function readSubtitleFile(file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        originalSubtitleText = e.target.result;
+        originalTextarea.value = originalSubtitleText;
+        showNotification('Subtitle file loaded successfully', 'success');
+    };
+    reader.readAsText(file);
+}
+
+// Update language tags
+function updateLanguageTags() {
+    const sourceLang = sourceLanguageSelect.value;
+    const targetLang = targetLanguageSelect.value;
+
+    originalLanguageTag.textContent = languageNames[sourceLang] || '1st Language';
+    translatedLanguageTag.textContent = languageNames[targetLang] || '2nd Language';
+}
+
+// Swap languages
+function swapLanguages() {
+    const sourceValue = sourceLanguageSelect.value;
+    const targetValue = targetLanguageSelect.value;
+
+    sourceLanguageSelect.value = targetValue;
+    targetLanguageSelect.value = sourceValue;
+
+    // Swap text content if both exist
+    if (originalSubtitleText && translatedSubtitleText) {
+        const tempText = originalTextarea.value;
+        originalTextarea.value = translatedTextarea.value;
+        translatedTextarea.value = tempText;
+
+        originalSubtitleText = originalTextarea.value;
+        translatedSubtitleText = translatedTextarea.value;
+    }
+
+    updateLanguageTags();
+    showNotification('Languages swapped successfully', 'info');
+}
+
+// Start translation process
+async function startTranslation() {
+    if (!originalSubtitleText.trim()) {
+        showNotification('Please upload a subtitle file first', 'error');
         return;
     }
 
-    // Check file size (limit to 500MB for demo)
-    const maxSize = 500 * 1024 * 1024; // 500MB
-    if (file.size > maxSize) {
-        showNotification('File size should be less than 500MB', 'error');
-        return;
-    }
-
-    selectedFile = file;
-    updateUploadArea();
-    enableTranslationControls();
-}
-
-function updateUploadArea() {
-    if (selectedFile) {
-        const uploadContent = uploadArea.querySelector('.upload-content');
-        uploadContent.innerHTML = `
-            <div class="upload-icon">✅</div>
-            <p class="upload-text">File Selected: ${selectedFile.name}</p>
-            <p class="file-info">Size: ${formatFileSize(selectedFile.size)}</p>
-            <button class="upload-btn" onclick="document.getElementById('movieFile').click()">
-                Change File
-            </button>
-        `;
-    }
-}
-
-function enableTranslationControls() {
-    translateBtn.disabled = false;
-    translateBtn.style.opacity = '1';
-}
-
-function formatFileSize(bytes) {
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    if (bytes === 0) return '0 Bytes';
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
-}
-
-// Translation functions
-function startTranslation() {
-    if (!selectedFile) {
-        showNotification('Please select a file first', 'error');
-        return;
-    }
-
-    if (translationInProgress) {
-        showNotification('Translation already in progress', 'warning');
-        return;
-    }
-
-    const sourceLanguage = document.getElementById('sourceLanguage').value;
-    const targetLanguage = document.getElementById('targetLanguage').value;
-    const translationMode = document.getElementById('translationMode').value;
-
-    if (sourceLanguage === targetLanguage) {
+    if (sourceLanguageSelect.value === targetLanguageSelect.value) {
         showNotification('Source and target languages cannot be the same', 'error');
         return;
     }
 
-    // Start translation process
-    translationInProgress = true;
-    showStatusSection();
-    updateTranslationStatus('Initializing translation...', 0);
-
-    // Disable controls during translation
-    translateBtn.disabled = true;
-    translateBtn.textContent = '🔄 Translating...';
-
-    // Simulate translation process
-    simulateTranslation();
-}
-
-function simulateTranslation() {
-    const steps = [
-        { message: 'Analyzing video file...', progress: 10 },
-        { message: 'Extracting audio track...', progress: 25 },
-        { message: 'Converting speech to text...', progress: 45 },
-        { message: 'Translating content with AI...', progress: 70 },
-        { message: 'Generating subtitles...', progress: 85 },
-        { message: 'Finalizing translation...', progress: 95 },
-        { message: 'Translation completed successfully!', progress: 100 }
-    ];
-
-    let currentStep = 0;
-
-    const interval = setInterval(() => {
-        if (currentStep < steps.length) {
-            const step = steps[currentStep];
-            updateTranslationStatus(step.message, step.progress);
-            currentStep++;
-        } else {
-            clearInterval(interval);
-            completeTranslation();
-        }
-    }, 2000);
-}
-
-function updateTranslationStatus(message, progress) {
-    statusMessage.textContent = message;
-    progressFill.style.width = progress + '%';
-    progressText.textContent = progress + '%';
-    currentProgress = progress;
-}
-
-function completeTranslation() {
-    translationInProgress = false;
-    translateBtn.disabled = false;
-    translateBtn.textContent = '🚀 Start Translation';
-
-    // Enable download button
-    downloadBtn.disabled = false;
-    downloadBtn.style.opacity = '1';
-
-    showNotification('Translation completed successfully!', 'success');
-}
-
-function resetTranslation() {
-    if (translationInProgress) {
-        if (!confirm('Are you sure you want to cancel the current translation?')) {
-            return;
-        }
-    }
-
-    // Reset all states
-    selectedFile = null;
-    translationInProgress = false;
-    currentProgress = 0;
-
-    // Reset UI
-    const uploadContent = uploadArea.querySelector('.upload-content');
-    uploadContent.innerHTML = `
-        <div class="upload-icon">📁</div>
-        <p class="upload-text">Input movie file</p>
-        <input type="file" id="movieFile" class="file-input" accept=".mp4,.avi,.mkv,.mov" />
-        <button class="upload-btn" onclick="document.getElementById('movieFile').click()">
-            Choose File
-        </button>
-    `;
-
-    // Reset form
-    document.getElementById('sourceLanguage').value = 'auto';
-    document.getElementById('targetLanguage').value = 'vi';
-    document.getElementById('translationMode').value = 'subtitle';
-
-    // Reset buttons
-    translateBtn.disabled = true;
-    translateBtn.textContent = '🚀 Start Translation';
-    translateBtn.style.opacity = '0.6';
-
-    downloadBtn.disabled = true;
-    downloadBtn.style.opacity = '0.6';
-
-    // Hide status section
-    hideStatusSection();
-
-    // Re-setup file upload
-    setupFileUpload();
-
-    showNotification('Translation reset successfully', 'info');
-}
-
-function showStatusSection() {
-    statusSection.style.display = 'block';
-    statusSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-function hideStatusSection() {
-    statusSection.style.display = 'none';
-}
-
-// Notes functions
-function saveNotes() {
-    const notes = adminNotes.value.trim();
-
-    if (notes) {
-        localStorage.setItem('adminTranslationNotes', notes);
-        showNotification('Notes saved successfully', 'success');
-    } else {
-        showNotification('Please enter some notes to save', 'warning');
-    }
-}
-
-function clearNotes() {
-    if (adminNotes.value.trim() && !confirm('Are you sure you want to clear all notes?')) {
+    if (isTranslating) {
+        showNotification('Translation is already in progress', 'warning');
         return;
     }
 
-    adminNotes.value = '';
-    localStorage.removeItem('adminTranslationNotes');
-    showNotification('Notes cleared', 'info');
+    isTranslating = true;
+    showLoadingModal('Translating subtitles...');
+
+    try {
+        // Mock translation process - replace with actual API call
+        await mockTranslationProcess();
+
+        const translatedText = simulateTranslation(originalSubtitleText, sourceLanguageSelect.value, targetLanguageSelect.value);
+        translatedSubtitleText = translatedText;
+        showTranslatedText();
+        showNotification('Translation completed successfully', 'success');
+        enableDownload();
+    } catch (error) {
+        console.error('Translation error:', error);
+        showNotification('Translation failed. Please try again.', 'error');
+    } finally {
+        isTranslating = false;
+        hideLoadingModal();
+    }
 }
 
+// Mock translation process
+async function mockTranslationProcess() {
+    const steps = [
+        'Analyzing subtitle content...',
+        'Processing language patterns...',
+        'Applying AI translation...',
+        'Optimizing subtitle timing...',
+        'Finalizing translation...'
+    ];
+
+    for (let i = 0; i < steps.length; i++) {
+        loadingText.textContent = steps[i];
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+}
+
+// Simulate translation (replace with real translation API)
+function simulateTranslation(originalText, sourceLanguage, targetLanguage) {
+    const lines = originalText.split('\n');
+    const translatedLines = [];
+
+    for (const line of lines) {
+        if (!line.trim()) {
+            translatedLines.push(line);
+            continue;
+        }
+
+        // Keep timestamps and sequence numbers as is
+        if (line.includes('-->') || line.match(/^\d+$/)) {
+            translatedLines.push(line);
+            continue;
+        }
+
+        // Mock translation based on target language
+        const translatedLine = targetLanguage === 'vi' ? `[VI] ${line}` :
+            targetLanguage === 'ja' ? `[JP] ${line}` :
+                targetLanguage === 'ko' ? `[KO] ${line}` :
+                    targetLanguage === 'zh' ? `[ZH] ${line}` :
+                        targetLanguage === 'es' ? `[ES] ${line}` :
+                            targetLanguage === 'fr' ? `[FR] ${line}` :
+                                targetLanguage === 'de' ? `[DE] ${line}` :
+                                    `[EN] ${line}`;
+
+        translatedLines.push(translatedLine);
+    }
+
+    return translatedLines.join('\n');
+}
+
+// Show translated text
+function showTranslatedText() {
+    translationPlaceholder.style.display = 'none';
+    translatedTextarea.style.display = 'block';
+    translatedTextarea.value = translatedSubtitleText;
+}
+
+// Handle translated text changes
+function onTranslatedTextChange() {
+    translatedSubtitleText = translatedTextarea.value;
+}
+
+// Save edits
+function saveEdits() {
+    if (!translatedSubtitleText.trim()) {
+        showNotification('No translated text to save', 'warning');
+        return;
+    }
+
+    translatedSubtitleText = translatedTextarea.value;
+    showNotification('Edits saved successfully', 'success');
+}
+
+// Auto format subtitle text
+function autoFormat() {
+    if (!translatedSubtitleText.trim()) {
+        showNotification('No text to format', 'warning');
+        return;
+    }
+
+    // Basic SRT formatting
+    let formattedText = translatedSubtitleText
+        .replace(/\r\n/g, '\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+
+    translatedTextarea.value = formattedText;
+    translatedSubtitleText = formattedText;
+    showNotification('Text formatted successfully', 'success');
+}
+
+// Enable download
+function enableDownload() {
+    downloadPlaceholder.style.display = 'none';
+    downloadReadyBtn.style.display = 'flex';
+}
+
+// Download translated file
+function downloadTranslatedFile() {
+    if (!translatedSubtitleText.trim()) {
+        showNotification('No translated text to download', 'error');
+        return;
+    }
+
+    try {
+        const blob = new Blob([translatedSubtitleText], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `translated_subtitle_${Date.now()}.srt`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        showNotification('File downloaded successfully', 'success');
+    } catch (error) {
+        console.error('Download error:', error);
+        showNotification('Download failed', 'error');
+    }
+}
+
+// Clear all data
+function clearAll() {
+    if (confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+        // Reset variables
+        uploadedMovieFile = null;
+        uploadedSubtitleFile = null;
+        originalSubtitleText = '';
+        translatedSubtitleText = '';
+
+        // Reset UI
+        movieUploadArea.innerHTML = `
+            <div class="upload-placeholder">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Input or drag movie file</p>
+                <input type="file" id="movieFileInput" accept=".mp4,.avi,.mkv,.mov,.wmv" hidden>
+                <button class="upload-btn" onclick="document.getElementById('movieFileInput').click()">
+                    Choose File
+                </button>
+            </div>
+        `;
+
+        originalSubtitleUpload.innerHTML = `
+            <div class="upload-placeholder">
+                <i class="fas fa-file-upload"></i>
+                <p>input or drag srt file</p>
+                <input type="file" id="originalSubtitleInput" accept=".srt,.vtt,.ass,.ssa,.sub" hidden>
+                <button class="upload-btn" onclick="document.getElementById('originalSubtitleInput').click()">
+                    Choose File
+                </button>
+            </div>
+        `;
+
+        originalTextarea.value = '';
+        translatedTextarea.value = '';
+        translatedTextarea.style.display = 'none';
+        translationPlaceholder.style.display = 'flex';
+        downloadReadyBtn.style.display = 'none';
+        downloadPlaceholder.style.display = 'flex';
+
+        // Reset file input references
+        const newMovieInput = document.getElementById('movieFileInput');
+        const newSubtitleInput = document.getElementById('originalSubtitleInput');
+        newMovieInput.addEventListener('change', handleMovieFileSelect);
+        newSubtitleInput.addEventListener('change', handleSubtitleFileSelect);
+
+        // Re-initialize drag and drop
+        initializeDragAndDrop();
+
+        showNotification('All data cleared', 'info');
+    }
+}
+
+// Save admin notes
+function saveNotes() {
+    const note = adminNotes.value.trim();
+    if (!note) {
+        showNotification('Please enter a note', 'warning');
+        return;
+    }
+
+    try {
+        localStorage.setItem('translatorAdminNotes', note);
+        showNotification('Note saved successfully', 'success');
+    } catch (error) {
+        console.error('Error saving note:', error);
+        showNotification('Failed to save note', 'error');
+    }
+}
+
+// Clear admin notes
+function clearNotes() {
+    if (confirm('Are you sure you want to clear the note?')) {
+        adminNotes.value = '';
+        localStorage.removeItem('translatorAdminNotes');
+        showNotification('Note cleared', 'info');
+    }
+}
+
+// Load saved notes
 function loadSavedNotes() {
-    const savedNotes = localStorage.getItem('adminTranslationNotes');
+    const savedNotes = localStorage.getItem('translatorAdminNotes');
     if (savedNotes) {
         adminNotes.value = savedNotes;
     }
 }
 
-// Utility functions
-function showNotification(message, type = 'info') {
-    // Remove existing notifications
-    const existingNotifications = document.querySelectorAll('.notification');
-    existingNotifications.forEach(notif => notif.remove());
+// Toggle notifications
+function toggleNotifications() {
+    notificationModal.classList.toggle('show');
+}
 
+// Close notifications
+function closeNotifications() {
+    notificationModal.classList.remove('show');
+}
+
+// Show loading modal
+function showLoadingModal(text) {
+    loadingText.textContent = text;
+    loadingModal.style.display = 'flex';
+}
+
+// Hide loading modal
+function hideLoadingModal() {
+    loadingModal.style.display = 'none';
+}
+
+// Show notification
+function showNotification(message, type = 'info') {
     // Create notification element
     const notification = document.createElement('div');
     notification.className = `notification notification-${type}`;
     notification.innerHTML = `
-        <span class="notification-message">${message}</span>
-        <button class="notification-close" onclick="this.parentElement.remove()">×</button>
+        <div class="notification-content">
+            <i class="fas ${getNotificationIcon(type)}"></i>
+            <span>${message}</span>
+        </div>
     `;
 
-    // Add notification styles
+    // Add styles
     notification.style.cssText = `
         position: fixed;
         top: 20px;
@@ -294,105 +534,70 @@ function showNotification(message, type = 'info') {
         background: ${getNotificationColor(type)};
         color: white;
         padding: 1rem 1.5rem;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        z-index: 10000;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 1001;
         animation: slideIn 0.3s ease;
+        max-width: 400px;
     `;
 
     document.body.appendChild(notification);
 
-    // Auto remove after 5 seconds
+    // Remove after 4 seconds
     setTimeout(() => {
-        if (notification.parentElement) {
-            notification.remove();
-        }
-    }, 5000);
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 4000);
 }
 
-function getNotificationColor(type) {
-    const colors = {
-        success: '#28a745',
-        error: '#dc3545',
-        warning: '#ffc107',
-        info: '#17a2b8'
-    };
-    return colors[type] || colors.info;
-}
-
-// Navigation functions
-function toggleNotifications() {
-    showNotification('Notifications feature coming soon!', 'info');
-}
-
-function toggleProfile() {
-    showNotification('Profile settings coming soon!', 'info');
-}
-
-// Download function
-downloadBtn.addEventListener('click', function () {
-    if (!this.disabled) {
-        // In a real implementation, this would download the translated file
-        showNotification('Download started! Check your downloads folder.', 'success');
-
-        // Simulate download
-        const link = document.createElement('a');
-        link.href = '#';
-        link.download = `translated_${selectedFile ? selectedFile.name : 'movie'}.srt`;
-        link.textContent = 'Download Subtitles';
-
-        // For demo purposes, we'll just show a message
-        console.log('Download would start here for:', link.download);
+// Get notification icon
+function getNotificationIcon(type) {
+    switch (type) {
+        case 'success': return 'fa-check-circle';
+        case 'error': return 'fa-exclamation-circle';
+        case 'warning': return 'fa-exclamation-triangle';
+        default: return 'fa-info-circle';
     }
-});
+}
 
-// Add CSS for animations
+// Get notification color
+function getNotificationColor(type) {
+    switch (type) {
+        case 'success': return '#28a745';
+        case 'error': return '#dc3545';
+        case 'warning': return '#ffc107';
+        default: return '#17a2b8';
+    }
+}
+
+// Format file size
+function formatFileSize(bytes) {
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    if (bytes === 0) return '0 Bytes';
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+}
+
+// Add CSS animations
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
     }
     
     .drag-over {
-        border-color: #667eea !important;
-        background: rgba(102, 126, 234, 0.1) !important;
-        transform: scale(1.02);
-    }
-    
-    .notification-close {
-        background: transparent;
-        border: none;
-        color: white;
-        font-size: 1.2rem;
-        cursor: pointer;
-        padding: 0;
-        width: 20px;
-        height: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition: background 0.2s ease;
-    }
-    
-    .notification-close:hover {
-        background: rgba(255, 255, 255, 0.2);
-    }
-    
-    .file-info {
-        color: #888;
-        font-size: 0.9rem;
-        margin: 0.5rem 0;
+        border-color: #007bff !important;
+        background: #f8f9ff !important;
     }
 `;
 document.head.appendChild(style);
